@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Final Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Space+Mono:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple-dark: #26215C;
+    --purple-mid: #534AB7;
+    --purple-light: #EEEDFE;
+    --purple-border: #AFA9EC;
+    --purple-text: #3C3489;
+    --teal-dark: #085041;
+    --teal-mid: #0F6E56;
+    --teal-light: #E1F5EE;
+    --coral-light: #FAECE7;
+    --coral-dark: #712B13;
+    --gray-bg: #F7F7F5;
+    --gray-border: #E2E0DA;
+    --gray-mid: #888780;
+    --text-primary: #1a1a18;
+    --text-secondary: #5F5E5A;
+    --text-muted: #A0A09A;
+    --card-bg: #ffffff;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Lato', sans-serif;
+    background: var(--gray-bg);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    background: var(--gray-bg);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .screen { display: none; padding-bottom: 80px; }
+  .screen.active { display: block; }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3rem 1.25rem 1rem;
+    background: var(--gray-bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .appname {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+  }
+
+  .pill-btn {
+    background: var(--card-bg);
+    border: 0.5px solid var(--gray-border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--purple-mid);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .pill-btn:active { transform: scale(0.97); }
+
+  .section-label {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 0 1.25rem;
+    margin-bottom: 10px;
+    margin-top: 1.25rem;
+  }
+
+  .card {
+    margin: 0 1rem 1rem;
+    background: var(--card-bg);
+    border: 0.5px solid var(--gray-border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+  }
+
+  .upload-zone {
+    margin: 0 1rem;
+    border: 1.5px dashed var(--gray-border);
+    border-radius: var(--radius);
+    padding: 2rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background: var(--card-bg);
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .upload-zone:hover { border-color: var(--purple-border); }
+
+  .upload-zone input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .upload-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: var(--purple-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--purple-mid);
+  }
+
+  .upload-label { font-size: 14px; color: var(--text-secondary); text-align: center; font-weight: 500; }
+  .upload-sub { font-size: 11px; color: var(--text-muted); font-family: 'Space Mono', monospace; }
+
+  #previewImg {
+    display: none;
+    width: calc(100% - 2rem);
+    margin: 0 1rem;
+    border-radius: var(--radius);
+    max-height: 300px;
+    object-fit: cover;
+  }
+
+  .tag-row {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+    padding: 0 1.25rem;
+  }
+
+  .tag {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 0.5px solid var(--gray-border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    background: var(--card-bg);
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .tag:active { transform: scale(0.96); }
+  .tag.active { background: var(--purple-light); border-color: var(--purple-border); color: var(--purple-text); }
+
+  .custom-input {
+    width: calc(100% - 2.5rem);
+    margin: 10px 1.25rem 0;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--gray-border);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--text-primary);
+    background: var(--card-bg);
+    outline: none;
+    display: block;
+  }
+
+  .custom-input:focus { border-color: var(--purple-border); }
+
+  .api-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0 1rem 0;
+  }
+
+  .api-input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--gray-border);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-primary);
+    background: var(--card-bg);
+    outline: none;
+  }
+
+  .api-input:focus { border-color: var(--purple-border); }
+
+  .api-save-btn {
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--purple-border);
+    background: var(--purple-light);
+    color: var(--purple-text);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .primary-btn {
+    display: block;
+    width: calc(100% - 2.5rem);
+    margin: 1.25rem 1.25rem 0;
+    background: var(--purple-dark);
+    color: #EEEDFE;
+    border: none;
+    border-radius: var(--radius);
+    padding: 15px;
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .primary-btn:active { transform: scale(0.98); }
+  .primary-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .loading-state {
+    display: none;
+    padding: 2.5rem 1.25rem;
+    text-align: center;
+  }
+
+  .spin {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--purple-light);
+    border-top-color: var(--purple-mid);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-state p {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    margin-top: 14px;
+  }
+
+  .result-card {
+    margin: 1.25rem 1rem 0;
+    border: 0.5px solid var(--gray-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card-bg);
+    animation: fadeUp 0.4s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-header {
+    background: var(--purple-dark);
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: #CECBF6;
+  }
+
+  .result-vibe {
+    font-size: 10px;
+    color: #7F77DD;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .scores-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    background: var(--card-bg);
+  }
+
+  .score-cell {
+    padding: 14px 16px;
+    border-bottom: 0.5px solid var(--gray-border);
+  }
+
+  .score-cell:nth-child(odd) { border-right: 0.5px solid var(--gray-border); }
+
+  .score-label {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .score-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--text-primary);
+  }
+
+  .score-val.purple { color: var(--purple-mid); }
+  .score-val.teal { font-size: 17px; color: var(--teal-mid); }
+  .score-val.small { font-size: 20px; color: var(--purple-mid); }
+
+  .feedback-area { padding: 14px 16px; background: var(--card-bg); }
+
+  .fb-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+
+  .fb-badge {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .fb-badge.s { background: var(--teal-light); color: var(--teal-dark); }
+  .fb-badge.w { background: var(--coral-light); color: var(--coral-dark); }
+  .fb-badge.p { background: var(--purple-light); color: var(--purple-text); }
+
+  .fb-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  .error-card {
+    margin: 1rem;
+    background: var(--coral-light);
+    border: 0.5px solid #F0997B;
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    font-size: 13px;
+    color: var(--coral-dark);
+    font-family: 'Space Mono', monospace;
+    line-height: 1.5;
+  }
+
+  .history-strip {
+    display: flex;
+    gap: 10px;
+    padding: 0 1.25rem 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .history-strip::-webkit-scrollbar { display: none; }
+
+  .h-thumb {
+    flex-shrink: 0;
+    width: 72px;
+    cursor: pointer;
+  }
+
+  .h-img-box {
+    width: 72px;
+    height: 90px;
+    border-radius: var(--radius-sm);
+    background: var(--gray-border);
+    overflow: hidden;
+    border: 0.5px solid var(--gray-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 22px;
+  }
+
+  .h-img-box img { width: 100%; height: 100%; object-fit: cover; }
+  .h-grade { font-size: 12px; font-family: 'Space Mono', monospace; color: var(--purple-mid); text-align: center; margin-top: 5px; font-weight: 700; }
+  .h-date { font-size: 9px; color: var(--text-muted); font-family: 'Space Mono', monospace; text-align: center; }
+
+  .empty-msg {
+    padding: 1rem 1.25rem;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .history-full-item {
+    margin: 0 1rem 0.75rem;
+    background: var(--card-bg);
+    border: 0.5px solid var(--gray-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .history-full-item:active { border-color: var(--purple-border); }
+
+  .hfi-inner { display: flex; gap: 12px; padding: 14px; }
+
+  .hfi-img {
+    width: 68px;
+    height: 84px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--gray-border);
+  }
+
+  .hfi-info { flex: 1; }
+  .hfi-name { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--text-primary); margin-bottom: 3px; }
+  .hfi-date { font-size: 10px; color: var(--text-muted); font-family: 'Space Mono', monospace; margin-bottom: 8px; }
+  .hfi-scores { display: flex; gap: 10px; align-items: center; }
+  .hfi-grade { font-size: 14px; font-family: 'Space Mono', monospace; color: var(--purple-mid); font-weight: 700; }
+  .hfi-tier { font-size: 12px; font-family: 'Space Mono', monospace; color: var(--teal-mid); }
+  .hfi-score { font-size: 12px; color: var(--text-muted); font-family: 'Space Mono', monospace; }
+
+  .profile-label {
+    display: block;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-secondary);
+    margin-bottom: 7px;
+    letter-spacing: 0.5px;
+  }
+
+  .profile-field { margin-bottom: 1.25rem; }
+
+  .profile-field input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--gray-border);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+    background: var(--card-bg);
+    outline: none;
+  }
+
+  .profile-field input:focus { border-color: var(--purple-border); }
+
+  .chip-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 7px; }
+
+  .chip {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 0.5px solid var(--gray-border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    background: var(--card-bg);
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .chip:active { transform: scale(0.95); }
+  .chip.active { background: var(--purple-light); border-color: var(--purple-border); color: var(--purple-text); }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(247,247,245,0.95);
+    backdrop-filter: blur(10px);
+    border-top: 0.5px solid var(--gray-border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 max(14px, env(safe-area-inset-bottom));
+    z-index: 100;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px 20px;
+  }
+
+  .nav-icon { font-size: 22px; color: var(--text-muted); }
+  .nav-item.active .nav-icon { color: var(--purple-mid); }
+  .nav-label { font-size: 9px; color: var(--text-muted); font-family: 'Space Mono', monospace; }
+  .nav-item.active .nav-label { color: var(--purple-mid); }
+
+  .api-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    padding: 6px 1.25rem 0;
+    line-height: 1.5;
+  }
+
+  .api-hint a { color: var(--purple-mid); }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --gray-bg: #111110;
+      --gray-border: #2A2A28;
+      --gray-mid: #888780;
+      --text-primary: #F0EFE8;
+      --text-secondary: #A0A09A;
+      --text-muted: #666660;
+      --card-bg: #1C1C1A;
+      --purple-light: #1E1A3A;
+      --purple-border: #3C3489;
+      --purple-text: #AFA9EC;
+      --teal-light: #0A1F1A;
+      --coral-light: #2A1510;
+      --coral-dark: #F0997B;
+      --teal-dark: #5DCAA5;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- RATE SCREEN -->
+  <div class="screen active" id="screen-rate">
+    <div class="topbar">
+      <div class="appname">Final Check</div>
+      <button class="pill-btn" onclick="showScreen('screen-profile')">&#9670; profile</button>
+    </div>
+
+    <div class="section-label">today's outfit</div>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" accept="image/*" id="fileInput" onchange="handleImage(event)" aria-label="Upload outfit photo">
+      <div class="upload-icon">&#128247;</div>
+      <div class="upload-label">Upload your outfit</div>
+      <div class="upload-sub">tap to choose from camera roll</div>
+    </div>
+    <img id="previewImg" alt="Outfit preview">
+
+    <div class="section-label">going for...</div>
+    <div class="tag-row" id="tagRow">
+      <span class="tag" onclick="toggleTag(this)">goth</span>
+      <span class="tag" onclick="toggleTag(this)">cottagecore</span>
+      <span class="tag" onclick="toggleTag(this)">streetwear</span>
+      <span class="tag" onclick="toggleTag(this)">dark academia</span>
+      <span class="tag" onclick="toggleTag(this)">clean girl</span>
+      <span class="tag" onclick="toggleTag(this)">y2k</span>
+      <span class="tag" onclick="toggleTag(this)">grunge</span>
+      <span class="tag" onclick="toggleTag(this)">minimalist</span>
+      <span class="tag" onclick="toggleTag(this)">boho</span>
+      <span class="tag" onclick="toggleTag(this)">preppy</span>
+      <span class="tag" onclick="toggleTag(this)">e-girl</span>
+      <span class="tag" onclick="toggleTag(this)">soft girl</span>
+    </div>
+    <input class="custom-input" type="text" id="customIntent" placeholder="or describe your own vibe..." aria-label="Custom style intent">
+
+    <div class="section-label" style="margin-top:1.25rem">api key</div>
+    <div class="api-row">
+      <input class="api-input" type="password" id="apiKeyInput" placeholder="sk-ant-..." aria-label="Anthropic API key">
+      <button class="api-save-btn" onclick="saveApiKey()">save</button>
+    </div>
+    <div class="api-hint">get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+
+    <button class="primary-btn" id="rateBtn" onclick="rateOutfit()" disabled>Rate this outfit</button>
+
+    <div class="loading-state" id="loadingState">
+      <div class="spin"></div>
+      <p>analyzing your fit...</p>
+    </div>
+
+    <div id="resultArea"></div>
+
+    <div class="section-label">past outfits</div>
+    <div class="history-strip" id="historyStrip">
+      <div class="empty-msg">no outfits yet</div>
+    </div>
+
+    <div style="height:1rem"></div>
+  </div>
+
+  <!-- HISTORY SCREEN -->
+  <div class="screen" id="screen-history">
+    <div class="topbar">
+      <div class="appname">outfit vault</div>
+      <button class="pill-btn" onclick="showScreen('screen-rate')">&#8592; back</button>
+    </div>
+    <div id="historyFull" style="padding-top:0.5rem"></div>
+  </div>
+
+  <!-- PROFILE SCREEN -->
+  <div class="screen" id="screen-profile">
+    <div class="topbar">
+      <div class="appname">your profile</div>
+      <button class="pill-btn" onclick="saveProfile()">save &#10003;</button>
+    </div>
+    <div class="card" style="margin-top:0.5rem">
+      <div class="profile-field">
+        <label class="profile-label">name</label>
+        <input type="text" id="pName" placeholder="your name">
+      </div>
+      <div class="profile-field">
+        <label class="profile-label">eye color</label>
+        <div class="chip-row" id="eyeChips">
+          <span class="chip" onclick="toggleChip(this,'eye')">brown</span>
+          <span class="chip" onclick="toggleChip(this,'eye')">blue</span>
+          <span class="chip" onclick="toggleChip(this,'eye')">green</span>
+          <span class="chip" onclick="toggleChip(this,'eye')">hazel</span>
+          <span class="chip" onclick="toggleChip(this,'eye')">grey</span>
+          <span class="chip" onclick="toggleChip(this,'eye')">amber</span>
+        </div>
+      </div>
+      <div class="profile-field">
+        <label class="profile-label">hair color</label>
+        <div class="chip-row" id="hairChips">
+          <span class="chip" onclick="toggleChip(this,'hair')">black</span>
+          <span class="chip" onclick="toggleChip(this,'hair')">brown</span>
+          <span class="chip" onclick="toggleChip(this,'hair')">blonde</span>
+          <span class="chip" onclick="toggleChip(this,'hair')">red</span>
+          <span class="chip" onclick="toggleChip(this,'hair')">grey</span>
+          <span class="chip" onclick="toggleChip(this,'hair')">dyed</span>
+        </div>
+      </div>
+      <div class="profile-field">
+        <label class="profile-label">skin tone</label>
+        <div class="chip-row" id="skinChips">
+          <span class="chip" onclick="toggleChip(this,'skin')">fair</span>
+          <span class="chip" onclick="toggleChip(this,'skin')">light</span>
+          <span class="chip" onclick="toggleChip(this,'skin')">medium</span>
+          <span class="chip" onclick="toggleChip(this,'skin')">tan</span>
+          <span class="chip" onclick="toggleChip(this,'skin')">deep</span>
+        </div>
+      </div>
+      <div class="profile-field">
+        <label class="profile-label">personality</label>
+        <div class="chip-row" id="personalityChips">
+          <span class="chip" onclick="toggleChip(this,'personality')">bold</span>
+          <span class="chip" onclick="toggleChip(this,'personality')">soft</span>
+          <span class="chip" onclick="toggleChip(this,'personality')">edgy</span>
+          <span class="chip" onclick="toggleChip(this,'personality')">playful</span>
+          <span class="chip" onclick="toggleChip(this,'personality')">minimalist</span>
+          <span class="chip" onclick="toggleChip(this,'personality')">eclectic</span>
+          <span class="chip" onclick="toggleChip(this,'personality')">introverted</span>
+        </div>
+      </div>
+      <div class="profile-field">
+        <label class="profile-label">body type</label>
+        <div class="chip-row" id="bodyChips">
+          <span class="chip" onclick="toggleChip(this,'body')">petite</span>
+          <span class="chip" onclick="toggleChip(this,'body')">athletic</span>
+          <span class="chip" onclick="toggleChip(this,'body')">curvy</span>
+          <span class="chip" onclick="toggleChip(this,'body')">tall</span>
+          <span class="chip" onclick="toggleChip(this,'body')">plus size</span>
+          <span class="chip" onclick="toggleChip(this,'body')">slim</span>
+        </div>
+      </div>
+    </div>
+    <div style="height:1rem"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-item active" id="nav-rate" onclick="showScreen('screen-rate')" aria-label="Rate">
+      <span class="nav-icon">✦</span>
+      <span class="nav-label">rate</span>
+    </button>
+    <button class="nav-item" id="nav-history" onclick="showScreen('screen-history')" aria-label="History">
+      <span class="nav-icon">◈</span>
+      <span class="nav-label">vault</span>
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="showScreen('screen-profile')" aria-label="Profile">
+      <span class="nav-icon">◉</span>
+      <span class="nav-label">profile</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+  let profile = {};
+  let history = [];
+  let currentImageB64 = null;
+  let currentMimeType = 'image/jpeg';
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const map = {'screen-rate':'nav-rate','screen-history':'nav-history','screen-profile':'nav-profile'};
+    if (map[id]) document.getElementById(map[id]).classList.add('active');
+    if (id === 'screen-history') renderHistoryFull();
+    window.scrollTo(0,0);
+  }
+
+  function toggleTag(el) {
+    el.classList.toggle('active');
+    updateRateBtn();
+  }
+
+  function toggleChip(el, group) {
+    document.querySelectorAll('#' + group + 'Chips .chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    profile[group] = el.textContent;
+    saveProfileToStorage();
+  }
+
+  function updateRateBtn() {
+    const key = localStorage.getItem('fc_api_key') || '';
+    document.getElementById('rateBtn').disabled = !currentImageB64 || !key;
+  }
+
+  function saveApiKey() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    if (key) {
+      localStorage.setItem('fc_api_key', key);
+      document.getElementById('apiKeyInput').value = '';
+      document.getElementById('apiKeyInput').placeholder = 'key saved!';
+      setTimeout(() => { document.getElementById('apiKeyInput').placeholder = 'sk-ant-...'; }, 2000);
+      updateRateBtn();
+    }
+  }
+
+  function handleImage(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    currentMimeType = file.type || 'image/jpeg';
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const dataUrl = ev.target.result;
+      currentImageB64 = dataUrl.split(',')[1];
+      const preview = document.getElementById('previewImg');
+      preview.src = dataUrl;
+      preview.style.display = 'block';
+      const zone = document.getElementById('uploadZone');
+      zone.style.padding = '0.75rem 1.25rem';
+      zone.querySelector('.upload-icon').style.display = 'none';
+      zone.querySelector('.upload-label').textContent = 'tap to change photo';
+      zone.querySelector('.upload-sub').style.display = 'none';
+      updateRateBtn();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function getVibeText() {
+    const tags = [...document.querySelectorAll('#tagRow .tag.active')].map(t => t.textContent);
+    const custom = document.getElementById('customIntent').value.trim();
+    if (custom) tags.push(custom);
+    return tags.length ? tags.join(', ') : 'no specific vibe';
+  }
+
+  function getProfileText() {
+    return [
+      profile.eye ? 'eye color: ' + profile.eye : '',
+      profile.hair ? 'hair: ' + profile.hair : '',
+      profile.skin ? 'skin tone: ' + profile.skin : '',
+      profile.personality ? 'personality: ' + profile.personality : '',
+      profile.body ? 'body type: ' + profile.body : '',
+      profile.name ? 'name: ' + profile.name : ''
+    ].filter(Boolean).join(', ') || 'no profile provided';
+  }
+
+  async function rateOutfit() {
+    const apiKey = localStorage.getItem('fc_api_key');
+    if (!currentImageB64 || !apiKey) return;
+
+    document.getElementById('rateBtn').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('resultArea').innerHTML = '';
+
+    const systemPrompt = `You are a sharp, honest, fashion-forward outfit rater. Analyze the outfit photo and give personalized, specific feedback based on the user's style intent and personal profile. Be direct but constructive — never cruel, never vague. Always respond in this exact JSON format with no extra text or markdown:
+{"grade":"A+/A/A-/B+/B/B-/C+/C/C-/D/F","score":8.5,"tier":"Iconic/Solid/Needs Work","styleMatch":92,"outfitName":"short creative name","strengths":["strength detail","another strength"],"weaknesses":["weakness detail"],"personalNote":"one sentence referencing their specific profile traits"}`;
+
+    const userMsg = `Style intent: ${getVibeText()}. Profile: ${getProfileText()}. Rate this outfit honestly and specifically based on what you see in the photo.`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: currentMimeType, data: currentImageB64 } },
+              { type: 'text', text: userMsg }
+            ]
+          }]
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || 'API error ' + res.status);
+      }
+
+      const data = await res.json();
+      const raw = data.content.map(c => c.text || '').join('');
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const result = JSON.parse(clean);
+
+      const entry = {
+        ...result,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        imageB64: currentImageB64
+      };
+
+      history.unshift(entry);
+      saveHistoryToStorage();
+      renderResult(entry);
+      renderHistoryStrip();
+
+    } catch (err) {
+      document.getElementById('resultArea').innerHTML = `
+        <div class="error-card">
+          <strong>couldn't analyze outfit</strong><br>
+          ${err.message || 'check your api key and try again'}
+        </div>`;
+    }
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('rateBtn').style.display = 'block';
+  }
+
+  function renderResult(r) {
+    document.getElementById('resultArea').innerHTML = `
+      <div class="result-card">
+        <div class="result-header">
+          <div class="result-title">${escHtml(r.outfitName || 'your outfit')}</div>
+          <div class="result-vibe">${r.date}</div>
+        </div>
+        <div class="scores-grid">
+          <div class="score-cell">
+            <div class="score-label">grade</div>
+            <div class="score-val purple">${escHtml(r.grade)}</div>
+          </div>
+          <div class="score-cell">
+            <div class="score-label">score</div>
+            <div class="score-val">${Number(r.score).toFixed(1)}<span style="font-size:13px;color:var(--text-muted)">/10</span></div>
+          </div>
+          <div class="score-cell" style="border-bottom:none">
+            <div class="score-label">tier</div>
+            <div class="score-val teal">${escHtml(r.tier)}</div>
+          </div>
+          <div class="score-cell" style="border-bottom:none">
+            <div class="score-label">style match</div>
+            <div class="score-val small">${Math.round(r.styleMatch)}%</div>
+          </div>
+        </div>
+        <div class="feedback-area">
+          ${(r.strengths||[]).map(s => `<div class="fb-row"><span class="fb-badge s">strength</span><span class="fb-text">${escHtml(s)}</span></div>`).join('')}
+          ${(r.weaknesses||[]).map(w => `<div class="fb-row"><span class="fb-badge w">weakness</span><span class="fb-text">${escHtml(w)}</span></div>`).join('')}
+          ${r.personalNote ? `<div class="fb-row"><span class="fb-badge p">you</span><span class="fb-text">${escHtml(r.personalNote)}</span></div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function renderHistoryStrip() {
+    const el = document.getElementById('historyStrip');
+    if (!history.length) {
+      el.innerHTML = '<div class="empty-msg">no outfits yet</div>';
+      return;
+    }
+    el.innerHTML = history.map((h, i) => `
+      <div class="h-thumb" onclick="viewHistoryEntry(${i})">
+        <div class="h-img-box">
+          <img src="data:image/jpeg;base64,${h.imageB64}" alt="Outfit">
+        </div>
+        <div class="h-grade">${escHtml(h.grade)}</div>
+        <div class="h-date">${escHtml(h.date)}</div>
+      </div>`).join('');
+  }
+
+  function renderHistoryFull() {
+    const el = document.getElementById('historyFull');
+    if (!history.length) {
+      el.innerHTML = '<div class="empty-msg" style="padding:2rem">no outfits rated yet — go rate something!</div>';
+      return;
+    }
+    el.innerHTML = history.map((h, i) => `
+      <div class="history-full-item" onclick="viewHistoryEntry(${i});showScreen('screen-rate')">
+        <div class="hfi-inner">
+          <img class="hfi-img" src="data:image/jpeg;base64,${h.imageB64}" alt="Outfit">
+          <div class="hfi-info">
+            <div class="hfi-name">${escHtml(h.outfitName || 'outfit')}</div>
+            <div class="hfi-date">${escHtml(h.date)}</div>
+            <div class="hfi-scores">
+              <span class="hfi-grade">${escHtml(h.grade)}</span>
+              <span style="color:var(--text-muted)">·</span>
+              <span class="hfi-tier">${escHtml(h.tier)}</span>
+              <span style="color:var(--text-muted)">·</span>
+              <span class="hfi-score">${Number(h.score).toFixed(1)}/10</span>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function viewHistoryEntry(i) {
+    renderResult(history[i]);
+    document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function saveProfile() {
+    profile.name = document.getElementById('pName').value.trim();
+    saveProfileToStorage();
+    showScreen('screen-rate');
+  }
+
+  function saveProfileToStorage() {
+    try { localStorage.setItem('fc_profile', JSON.stringify(profile)); } catch(e) {}
+  }
+
+  function saveHistoryToStorage() {
+    try {
+      const slim = history.map(h => ({...h, imageB64: h.imageB64.slice(0,200)}));
+      localStorage.setItem('fc_history_meta', JSON.stringify(slim));
+    } catch(e) {}
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function init() {
+    try {
+      const savedProfile = localStorage.getItem('fc_profile');
+      if (savedProfile) {
+        profile = JSON.parse(savedProfile);
+        if (profile.name) document.getElementById('pName').value = profile.name;
+        ['eye','hair','skin','personality','body'].forEach(g => {
+          if (profile[g]) {
+            document.querySelectorAll('#' + g + 'Chips .chip').forEach(c => {
+              if (c.textContent === profile[g]) c.classList.add('active');
+            });
+          }
+        });
+      }
+      const savedKey = localStorage.getItem('fc_api_key');
+      if (savedKey) {
+        document.getElementById('apiKeyInput').placeholder = 'key saved ✓';
+      }
+    } catch(e) {}
+    updateRateBtn();
+  }
+
+  init();
+</script>
+</body>
+</html>
